@@ -1,68 +1,42 @@
-import cv2
-import numpy as np
+import tensorflow as tf
+from tensorflow.keras import layers, models
 
-# 1️⃣ ROI(관심 영역) 설정
-def region_of_interest(img):
-    height, width = img.shape[:2]
-    mask = np.zeros_like(img)
+# ✅ GPU 사용 여부 확인
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    try:
+        tf.config.experimental.set_memory_growth(gpus[0], True)
+        print(f"GPU 사용 중: {gpus[0]}")
+    except RuntimeError as e:
+        print(e)
+else:
+    print("GPU를 사용할 수 없습니다.")
 
-    # 차선이 있는 영역 (다각형)
-    polygon = np.array([[
-        (int(width * 0.01), int(height * 0.75)),  # 좌측 하단
-        (int(width * 0.4), int(height * 0.55)),  # 좌측 상단
-        (int(width * 0.6), int(height * 0.55)),  # 우측 상단
-        (int(width * 0.99), int(height * 0.75))   # 우측 하단
-    ]], np.int32)
+# ✅ 데이터셋 준비 (MNIST)
+(x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+x_train, x_test = x_train / 255.0, x_test / 255.0
+x_train = x_train[..., tf.newaxis].astype("float32")
+x_test = x_test[..., tf.newaxis].astype("float32")
 
-    cv2.fillPoly(mask, polygon, (255, 255, 255))
-    masked_image = cv2.bitwise_and(img, mask)
-    return masked_image
+# ✅ 모델 정의
+model = models.Sequential([
+    layers.Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(28, 28, 1)),
+    layers.MaxPooling2D(pool_size=(2, 2)),
+    layers.Conv2D(64, kernel_size=(3, 3), activation='relu'),
+    layers.MaxPooling2D(pool_size=(2, 2)),
+    layers.Flatten(),
+    layers.Dense(128, activation='relu'),
+    layers.Dense(10, activation='softmax'),
+])
 
-# 2️⃣ Canny Edge Detection
-def detect_edges(img):
-    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    blur = cv2.GaussianBlur(gray, (5, 5), 0)
-    edges = cv2.Canny(blur, 50, 150)
-    return edges
+# ✅ 모델 컴파일
+model.compile(  optimizer='adam',
+                loss='sparse_categorical_crossentropy',
+                metrics=['accuracy'])
 
-# 3️⃣ 허프 변환을 통한 차선 검출
-def hough_transform(edges, img):
-    lines = cv2.HoughLinesP(edges, rho=2, theta=np.pi/180, threshold=100, minLineLength=50, maxLineGap=50)
-    line_image = np.zeros_like(img)
+# ✅ 학습
+model.fit(x_train, y_train, epochs=5, batch_size=64, validation_data=(x_test, y_test))
 
-    if lines is not None:
-        for line in lines:
-            x1, y1, x2, y2 = line[0]
-            cv2.line(line_image, (x1, y1), (x2, y2), (255, 0, 0), 5)
-
-    return line_image
-
-# 4️⃣ 영상에서 차선 검출
-def process_video(video_path):
-    cap = cv2.VideoCapture(video_path)
-
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
-
-        # 프레임 전처리
-        roi_img = region_of_interest(frame)
-        edges = detect_edges(roi_img)
-        lane_lines = hough_transform(edges, frame)
-
-        # 차선 검출된 결과를 원본 이미지에 합성
-        result = cv2.addWeighted(frame, 0.8, lane_lines, 1, 0)
-
-        # 결과 출력
-        cv2.imshow("Lane Detection", result)
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):  # 'q'를 누르면 종료
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
-
-# 📌 실행 (이미 다운로드된 영상 파일 사용)
-video_path = "video.mp4"  # 다운로드된 영상 파일명
-process_video(video_path)
+# ✅ 평가
+test_loss, test_acc = model.evaluate(x_test, y_test, verbose=2)
+print(f"테스트 정확도: {test_acc:.4f}")
