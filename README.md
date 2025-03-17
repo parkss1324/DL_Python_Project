@@ -28,4 +28,4 @@ Visual Studio Code와 Pytorch, 딥러닝 기술을 활용하여 옷 종류를 �
 - 딥러닝으로 학습한 모델을 바탕으로 옷 종류를 구별합니다.
 
 ## ✒️ 딥러닝
-- 딥러닝 개념: [[https://www.intel.co.kr/content/www/kr/ko/manufacturing/what-is-machine-vision.html](https://terms.naver.com/entry.naver?docId=3347329&cid=40942&categoryId=32845)](https://ko.wikipedia.org/wiki/%EB%94%A5_%EB%9F%AC%EB%8B%9D)
+- 딥러닝 개념: [https://ko.wikipedia.org/wiki/%EB%94%A5_%EB%9F%AC%EB%8B%9D](https://ko.wikipedia.org/wiki/%EB%94%A5_%EB%9F%AC%EB%8B%9D)
