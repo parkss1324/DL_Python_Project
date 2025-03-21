@@ -13,13 +13,13 @@ print(f"Using device: {device}")
 
 # FashionMNIST 모델 정의
 class FashionMNISTModel(nn.Module):
-    def __init__(self):
+    def __init__(self): # 레이어 층 정의
         super(FashionMNISTModel, self).__init__()
-        self.conv1 = nn.Conv2d(1, 32, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv2d(1, 32, kernel_size=3, padding=1) # 합성곱 계층 정의
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
-        self.pool = nn.MaxPool2d(2, 2)
-        self.fc1 = nn.Linear(64 * 7 * 7, 128)
-        self.fc2 = nn.Linear(128, 10)
+        self.pool = nn.MaxPool2d(2, 2) # 합성곱의 결과로 나온 Feature map의 크기를 절반으로 줄임 
+        self.fc1 = nn.Linear(64 * 7 * 7, 128) # 배치 사이즈, 뉴런
+        self.fc2 = nn.Linear(128, 10) # 10개의 클래스로 분류
 
     def forward(self, x):
         x = self.pool(torch.relu(self.conv1(x)))  # 첫 번째 합성곱 -> ReLU -> MaxPool
