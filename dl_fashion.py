@@ -17,13 +17,13 @@ class FashionMNISTModel(nn.Module):
         super(FashionMNISTModel, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, kernel_size=3, padding=1) # 합성곱 계층 정의
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
-        self.pool = nn.MaxPool2d(2, 2) # 합성곱의 결과로 나온 Feature map의 크기를 절반으로 줄임 
+        self.pool = nn.MaxPool2d(2, 2) # 커널 크기, 스트라이드2 합성곱의 결과로 나온 Feature map의 크기를 절반으로 줄임 
         self.fc1 = nn.Linear(64 * 7 * 7, 128) # 배치 사이즈, 뉴런
         self.fc2 = nn.Linear(128, 10) # 10개의 클래스로 분류
 
     def forward(self, x):
-        x = self.pool(torch.relu(self.conv1(x)))  # 첫 번째 합성곱 -> ReLU -> MaxPool
-        x = self.pool(torch.relu(self.conv2(x)))  # 두 번째 합성곱 -> ReLU -> MaxPool
+        x = self.pool(torch.relu(self.conv1(x)))  # 첫 번째 합성곱 -> ReLU -> MaxPool 14x14
+        x = self.pool(torch.relu(self.conv2(x)))  # 두 번째 합성곱 -> ReLU -> MaxPool 7x7
         x = x.view(-1, 64 * 7 * 7)  # Fully Connected Layer 입력을 위해 Flatten
         x = torch.relu(self.fc1(x))
         x = self.fc2(x)  # 출력층 (10개 클래스)
