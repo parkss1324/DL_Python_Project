@@ -17,7 +17,7 @@ class FashionMNISTModel(nn.Module):
         super(FashionMNISTModel, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, kernel_size=3, padding=1) # 합성곱 계층 정의
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
-        self.pool = nn.MaxPool2d(2, 2) # 커널 크기, 스트라이드2 합성곱의 결과로 나온 Feature map의 크기를 절반으로 줄임 
+        self.pool = nn.MaxPool2d(2, 2) # 커널 크기 2, 스트라이드 2 합성곱의 결과로 나온 Feature map의 크기를 절반으로 줄임 
         self.fc1 = nn.Linear(64 * 7 * 7, 128) # 배치 사이즈, 뉴런
         self.fc2 = nn.Linear(128, 10) # 10개의 클래스로 분류
 
